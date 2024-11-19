@@ -1,12 +1,19 @@
+*/.idea/*
+*/project/*
+*/target/*
+*/.bsp/*
 *.class
 *.log
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-
+target/
+project/target/
+api/
 
 *.iml
-*.ipr
-*.iws
 .idea
-out
+.bsp/*
+output\.html
+/CSYEoutput.html
+/draft final.pages
+/.bsp/
+/logFile
