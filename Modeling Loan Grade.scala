@@ -86,7 +86,7 @@ val newassembler = new VectorAssembler()
   .setInputCols(Array("homeOwnershipVec", "loanIntentVec", "defaultOnFileVec", "person_age", "person_income", "person_emp_length",
     "loan_amnt", "loan_int_rate", "loan_percent_income", "cb_person_cred_hist_length", "age_minus_history",
     "actual_loan_interest", "employment_stability"))
-  .setOutputCol("new_features")
+  .setOutputCol("new_features").setHandleInvalid("skip")
 
 val output = newassembler.transform(enhancedData)
 val finalOutput = output.drop("features").withColumnRenamed("new_features", "features")
@@ -105,26 +105,33 @@ finalOutput.columns
 trainingData.printSchema()
 
 // Model
-import org.apache.spark.ml.classification.GBTClassifier
+import org.apache.spark.ml.classification.MultilayerPerceptronClassifier
 
-val gbt = new GBTClassifier()
+// Set up the layers of the neural network
+// The first layer is the input layer (number of features),
+// the middle layers are the hidden layers
+// the last layer is the output layer (number of classes)
+val layers = Array[Int](19, 64, 32, 64, 7)  // Change 7 to the number of classes you have
+
+val mlp = new MultilayerPerceptronClassifier()
   .setLabelCol("indexedLabel")
   .setFeaturesCol("features")
-  .setMaxIter(10)
+  .setMaxIter(100)
+  .setLayers(layers)
 
-val model = gbt.fit(trainingData)
-val predictions = model.transform(validationData)
+val mlpModel = mlp.fit(trainingData)
+val mlpPredictions = mlpModel.transform(validationData)
 
 
 // Evaluation
+// Evaluate accuracy
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
-
 val evaluator = new MulticlassClassificationEvaluator()
   .setLabelCol("indexedLabel")
   .setPredictionCol("prediction")
   .setMetricName("accuracy")
 
-val accuracy = evaluator.evaluate(predictions)
-println("Test Error = " + (1.0 - accuracy))
+val accuracy = evaluator.evaluate(mlpPredictions)
+println(s"Test Accuracy = $accuracy")
 
-val testPredictions = xgbModel.transform(finalTestOutput)
+val testPredictions = model.transform(finalTestOutput)
