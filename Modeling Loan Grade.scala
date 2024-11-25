@@ -125,53 +125,53 @@ import org.apache.spark.ml.classification.MultilayerPerceptronClassifier
 //
 //val mlpModel = mlp.fit(trainingData)
 //val mlpPredictions = mlpModel.transform(validationData)
-import org.apache.spark.ml.classification.MultilayerPerceptronClassifier
-import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
-import org.apache.spark.ml.tuning.{ParamGridBuilder, CrossValidator}
-
-// Reduce the number of layers and neurons to simplify the network
-val layers = Array[Int](19, 15, 15, 7)  // Use fewer neurons
-
-// Initialize the MLP
-val mlp = new MultilayerPerceptronClassifier()
-  .setLabelCol("indexedLabel")
-  .setFeaturesCol("features")
-  .setLayers(layers)
-  .setBlockSize(128)
-  .setSeed(1234L)
-  .setSolver("l-bfgs")  // Use 'sgd' solver for faster convergence
-  .setTol(1E-6)
-  .setStepSize(0.03)
-
-// Define the parameter grid with fewer combinations
-val paramGrid = new ParamGridBuilder()
-  .addGrid(mlp.maxIter, Array(50, 100))
-  .addGrid(mlp.layers, Array(Array(19, 15, 15, 7)))  // Only one configuration to try
-  .build()
-
-// Evaluator
-val evaluator = new MulticlassClassificationEvaluator()
-  .setLabelCol("indexedLabel")
-  .setPredictionCol("prediction")
-  .setMetricName("accuracy")
-
-// Cross Validator
-val cv = new CrossValidator()
-  .setEstimator(mlp)
-  .setEvaluator(evaluator)
-  .setEstimatorParamMaps(paramGrid)
-  .setNumFolds(3)  // Use 3 folds for faster results
-  .setParallelism(1)  // Keep parallelism low for a single machine
-
-// Run cross-validation
-val cvModel = cv.fit(trainingData)
-
-// Use the test data to measure the accuracy
-val mlpPredictions = cvModel.transform(validationData)
-
-// Evaluate the best model
-val accuracy = evaluator.evaluate(mlpPredictions)
-println(s"Test Accuracy = $accuracy")
+//import org.apache.spark.ml.classification.MultilayerPerceptronClassifier
+//import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
+//import org.apache.spark.ml.tuning.{ParamGridBuilder, CrossValidator}
+//
+//// Reduce the number of layers and neurons to simplify the network
+//val layers = Array[Int](19, 15, 15, 7)  // Use fewer neurons
+//
+//// Initialize the MLP
+//val mlp = new MultilayerPerceptronClassifier()
+//  .setLabelCol("indexedLabel")
+//  .setFeaturesCol("features")
+//  .setLayers(layers)
+//  .setBlockSize(128)
+//  .setSeed(1234L)
+//  .setSolver("l-bfgs")  // Use 'sgd' solver for faster convergence
+//  .setTol(1E-6)
+//  .setStepSize(0.03)
+//
+//// Define the parameter grid with fewer combinations
+//val paramGrid = new ParamGridBuilder()
+//  .addGrid(mlp.maxIter, Array(50, 100))
+//  .addGrid(mlp.layers, Array(Array(19, 15, 15, 7)))  // Only one configuration to try
+//  .build()
+//
+//// Evaluator
+//val evaluator = new MulticlassClassificationEvaluator()
+//  .setLabelCol("indexedLabel")
+//  .setPredictionCol("prediction")
+//  .setMetricName("accuracy")
+//
+//// Cross Validator
+//val cv = new CrossValidator()
+//  .setEstimator(mlp)
+//  .setEvaluator(evaluator)
+//  .setEstimatorParamMaps(paramGrid)
+//  .setNumFolds(3)  // Use 3 folds for faster results
+//  .setParallelism(1)  // Keep parallelism low for a single machine
+//
+//// Run cross-validation
+//val cvModel = cv.fit(trainingData)
+//
+//// Use the test data to measure the accuracy
+//val mlpPredictions = cvModel.transform(validationData)
+//
+//// Evaluate the best model
+//val accuracy = evaluator.evaluate(mlpPredictions)
+//println(s"Test Accuracy = $accuracy")
 
 
 
@@ -187,3 +187,27 @@ println(s"Test Accuracy = $accuracy")
 //println(s"Test Accuracy = $accuracy")
 //
 //val testPredictions = model.transform(finalTestOutput)
+
+
+import org.apache.spark.ml.classification.DecisionTreeClassifier
+import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
+
+val decisionTree = new DecisionTreeClassifier()
+  .setLabelCol("indexedLabel")
+  .setFeaturesCol("features")
+
+val model = decisionTree.fit(trainingData)
+
+val evaluator = new MulticlassClassificationEvaluator()
+  .setLabelCol("indexedLabel")
+  .setPredictionCol("prediction")
+  .setMetricName("accuracy")  // can be "accuracy", "weightedPrecision", "weightedRecall", or "f1"
+
+val predictions = model.transform(validationData)
+
+val accuracy = evaluator.evaluate(predictions)
+
+println(s"Test Error = ${(1.0 - accuracy)}")
+println(s"Accuracy = $accuracy")
+
+println(s"Learned classification tree model:\n ${model.toDebugString}")
