@@ -19,3 +19,8 @@ output\.html
 /logFile
 
 .DS_Store
+
+/.idea_modules
+/.classpath
+/.settings
+/RUNNING_PID
