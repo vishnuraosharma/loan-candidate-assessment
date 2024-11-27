@@ -1,0 +1,17 @@
+@(loginForm: Form[LoginData])(implicit request: MessagesRequestHeader)
+@main("Login") {
+  <h1>Login</h1>
+
+  @request.flash.get("error").map { message =>
+    <div class="error">@message</div>
+  }
+
+  @helper.form(routes.AuthController.doLogin) {
+    @helper.CSRF.formField
+    @helper.inputText(loginForm("username"))
+    @helper.inputPassword(loginForm("password"))
+    <button type="submit">Login</button>
+  }
+
+  <p>Don't have an account? <a href="@routes.AuthController.signup">Sign up</a></p>
+}

@@ -1,0 +1,8 @@
+@()(implicit request: MessagesRequestHeader)
+@main("Loan Requester Dashboard") {
+  <h1>Welcome, Loan Requester!</h1>
+  <div class="dashboard">
+    <button onclick="location.href='#'">Request Loans</button>
+    <button onclick="location.href='@routes.AuthController.logout'">Logout</button>
+  </div>
+}
