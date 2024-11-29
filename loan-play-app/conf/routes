@@ -1,0 +1,10 @@
+GET     /                           controllers.AuthController.login()
+GET     /login                      controllers.AuthController.login()
+POST    /login                      controllers.AuthController.doLogin()
+GET     /signup                     controllers.AuthController.signup()
+POST    /signup                     controllers.AuthController.doSignup()
+GET     /logout                     controllers.AuthController.logout()
+GET     /dashboard                  controllers.DashboardController.index()
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file              controllers.Assets.versioned(path="/public", file: Asset)

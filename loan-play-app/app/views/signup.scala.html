@@ -1,0 +1,22 @@
+@(signupForm: Form[SignupData])(implicit request: MessagesRequestHeader)
+@main("Sign Up") {
+  <h1>Sign Up</h1>
+
+  @request.flash.get("error").map { message =>
+    <div class="error">@message</div>
+  }
+
+  @helper.form(routes.AuthController.doSignup) {
+    @helper.CSRF.formField
+    @helper.inputText(signupForm("username"))
+    @helper.inputPassword(signupForm("password"))
+    @helper.select(
+      signupForm("role"),
+      options = Seq(
+        "Loan Grantor" -> "Loan Grantor",
+        "Loan Requester" -> "Loan Requester"
+      )
+    )
+    <button type="submit">Sign Up</button>
+  }
+}

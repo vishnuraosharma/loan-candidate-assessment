@@ -1,0 +1,13 @@
+@(title: String)(content: Html)(implicit request: MessagesRequestHeader)
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>@title</title>
+        <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/main.css")">
+    </head>
+    <body>
+        <div class="container">
+        @content
+        </div>
+    </body>
+</html>
