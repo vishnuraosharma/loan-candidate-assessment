@@ -1,8 +1,69 @@
-@()(implicit request: MessagesRequestHeader)
+@(loans: Seq[Loan])(implicit request: MessagesRequestHeader)
+@import controllers.routes
 @main("Loan Grantor Dashboard") {
   <h1>Welcome, Loan Grantor!</h1>
-  <div class="dashboard">
-    <button onclick="location.href='#'">Manage Loans</button>
+  
+  <div class="dashboard-actions">
+    <button onclick="location.href='@routes.LoanController.manageLoanPage'">Manage Loans</button>
+  </div>
+  
+  @if(loans.nonEmpty) {
+    <div class="loans-table">
+      <h2>Previously Submitted Loans</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Amount</th>
+            <th>Purpose</th>
+            <th>Interest Rate</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+        @for(loan <- loans) {
+          <tr>
+            <td>@loan.id</td>
+            <td>$@{"%.2f".format(loan.amountRequested)}</td>
+            <td>@loan.intent</td>
+            <td>@{"%.1f".format(loan.interestRate)}%</td>
+            <td>@loan.status</td>
+          </tr>
+        }
+        </tbody>
+      </table>
+      
+      <div class="loan-actions">
+        <select id="loanSelector" onchange="console.log(this.value)">
+          <option value="">Select a loan...</option>
+          @for(loan <- loans) {
+            <option value="@loan.id">Loan ID: @loan.id</option>
+          }
+        </select>
+        
+        <button onclick="calculateSelectedLoan()">
+          Calculate Loan Grade and Approval Status
+        </button>
+      </div>
+    </div>
+  } else {
+    <div class="no-loans">
+      <p>No loans available.</p>
+    </div>
+  }
+
+  <div class="dashboard-actions">
     <button onclick="location.href='@routes.AuthController.logout'">Logout</button>
   </div>
+
+  <script>
+    function calculateSelectedLoan() {
+      const selectedLoanId = document.getElementById('loanSelector').value;
+      if (selectedLoanId) {
+        location.href = '/loans/' + selectedLoanId + '/calculate';
+      } else {
+        alert('Please select a loan first');
+      }
+    }
+  </script>
 }

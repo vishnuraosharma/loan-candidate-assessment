@@ -1,0 +1,94 @@
+@import models.LoanFormData
+@(loanForm: Form[LoanFormData], loans: Seq[Loan])(implicit request: MessagesRequestHeader)
+
+@main("Manage Loans") {
+  <div class="page-header">
+    <button class="back-button" onclick="location.href='@routes.DashboardController.index'">← Back to Dashboard</button>
+    <h1>Manage Loans</h1>
+  </div>
+
+  @if(loans.nonEmpty) {
+    <div class="loans-table">
+      <h2>Previously Submitted Loans</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Amount Requested</th>
+          </tr>
+        </thead>
+        <tbody>
+        @for(loan <- loans) {
+          <tr>
+            <td>@loan.id</td>
+            <td>$@{"%.2f".format(loan.amountRequested)}</td>
+          </tr>
+        }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <div class="create-loan-form">
+    <h2>Add a New Loan</h2>
+    @helper.form(routes.LoanController.createLoan) {
+      @helper.CSRF.formField
+      
+      <div class="form-section">
+        <h3>Personal Information</h3>
+        @helper.inputText(loanForm("personAge"), Symbol("_label") -> "Age")
+        @helper.inputText(loanForm("personIncome"), Symbol("_label") -> "Annual Income ($)")
+        @helper.inputText(loanForm("employmentLength"), Symbol("_label") -> "Years of Employment")
+      </div>
+
+      <div class="form-section">
+        <h3>Property Information</h3>
+        @helper.select(
+          loanForm("ownershipType"),
+          options = Seq(
+            "RENT" -> "Rent",
+            "OWN" -> "Own",
+            "MORTGAGE" -> "Mortgage",
+            "OTHER" -> "Other"
+          ),
+          Symbol("_label") -> "Housing Status"
+        )
+      </div>
+
+      <div class="form-section">
+        <h3>Loan Details</h3>
+        @helper.select(
+          loanForm("intent"),
+          options = Seq(
+            "PERSONAL" -> "Personal",
+            "EDUCATION" -> "Education",
+            "MEDICAL" -> "Medical",
+            "VENTURE" -> "Business Venture",
+            "HOMEIMPROVEMENT" -> "Home Improvement",
+            "DEBTCONSOLIDATION" -> "Debt Consolidation"
+          ),
+          Symbol("_label") -> "Purpose of Loan"
+        )
+        @helper.inputText(loanForm("amountRequested"), Symbol("_label") -> "Requested Amount ($)")
+        @helper.inputText(loanForm("interestRate"), Symbol("_label") -> "Interest Rate (%)")
+      </div>
+
+      <div class="form-section">
+        <h3>Credit Information</h3>
+        @helper.select(
+          loanForm("priorDefault"),
+          options = Seq(
+            "false" -> "No",
+            "true" -> "Yes"
+          ),
+          Symbol("_label") -> "Previous Defaults?"
+        )
+        @helper.inputText(loanForm("creditHistory"), Symbol("_label") -> "Years of Credit History")
+      </div>
+
+      <div class="form-actions">
+        <button type="submit">Create Loan</button>
+      </div>
+    }
+  </div>
+}
