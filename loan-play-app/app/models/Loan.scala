@@ -12,5 +12,6 @@ case class Loan(
                  priorDefault: Boolean,
                  creditHistory: Int,
                  grantorUsername: String,
-                 status: String = "Pending"
+                 status: String = "-",
+                 loanGrade: String = "-"
                )

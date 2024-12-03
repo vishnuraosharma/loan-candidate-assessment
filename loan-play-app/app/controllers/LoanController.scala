@@ -8,14 +8,20 @@ import play.api.data.format.Formats._
 import play.api.i18n.I18nSupport
 import java.util.UUID
 import models.{Loan, LoanFormData}
+import services.GrantorLoanService
+import org.apache.spark.sql.DataFrame
 
 @Singleton
 class LoanController @Inject()(
-                                cc: MessagesControllerComponents
+                                cc: MessagesControllerComponents,
+                                grantorLoanService: GrantorLoanService
                               ) extends MessagesAbstractController(cc) with I18nSupport {
 
   // Map of username -> their loans
   private val userLoans = scala.collection.mutable.Map[String, scala.collection.mutable.ArrayBuffer[Loan]]()
+  
+  // Store DataFrames for each grantor
+  private val grantorDataFrames = scala.collection.mutable.Map[String, DataFrame]()
 
   val loanForm = Form(
     mapping(
@@ -62,7 +68,24 @@ class LoanController @Inject()(
               creditHistory = loanData.creditHistory,
               grantorUsername = username
             )
+            
+            // Process loan through Spark pipeline
+            val transformedDF = grantorLoanService.processLoan(loan)
+            // Print the id of the loan
+            println(s"Loan ID: ${loan.id}")
+            //print the id column of the transformedDF
+            transformedDF.show()
+
+            // Update both maps
             userLoans.getOrElseUpdate(username, scala.collection.mutable.ArrayBuffer[Loan]()) += loan
+            
+            grantorDataFrames.get(username) match {
+              case Some(existingDF) =>
+                grantorDataFrames(username) = existingDF.union(transformedDF)
+              case None =>
+                grantorDataFrames(username) = transformedDF
+            }
+            
             Redirect(routes.DashboardController.index)
               .flashing("success" -> "Loan application submitted successfully")
           }
@@ -92,5 +115,9 @@ class LoanController @Inject()(
       case None => 
         Redirect(routes.AuthController.login)
     }
+  }
+
+  def getGrantorDataFrame(grantorUsername: String): Option[DataFrame] = {
+    grantorDataFrames.get(grantorUsername)
   }
 }

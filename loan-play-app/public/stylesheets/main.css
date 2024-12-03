@@ -163,3 +163,99 @@ th {
 .loan-actions button:hover {
   background-color: #218838;
 }
+
+.analytics-container {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.analytics-section {
+  flex: 1;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+}
+
+.analytics-section.accepted {
+  border-left: 4px solid #28a745;
+}
+
+.analytics-section.rejected {
+  border-left: 4px solid #dc3545;
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.metric {
+  text-align: center;
+  padding: 10px;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.metric h3 {
+  font-size: 0.9em;
+  color: #6c757d;
+  margin-bottom: 5px;
+}
+
+.metric p {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin: 0;
+}
+
+.grade-chart {
+  margin-top: 20px;
+}
+
+.grade-chart h3 {
+  margin-bottom: 15px;
+  font-size: 1em;
+  color: #495057;
+}
+
+.chart {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chart-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bar-label {
+  width: 30px;
+  font-weight: bold;
+}
+
+.bar {
+  height: 20px;
+  background-color: #007bff;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.bar-value {
+  min-width: 45px;
+  text-align: right;
+}
+
+.accepted .bar {
+  background-color: #28a745;
+}
+
+.rejected .bar {
+  background-color: #dc3545;
+}

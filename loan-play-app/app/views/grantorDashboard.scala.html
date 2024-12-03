@@ -6,8 +6,104 @@
   <div class="dashboard-actions">
     <button onclick="location.href='@routes.LoanController.manageLoanPage'">Manage Loans</button>
   </div>
-  
+
   @if(loans.nonEmpty) {
+    <div class="analytics-container">
+      <div class="analytics-section accepted">
+        <h2>Accepted Loans Analytics</h2>
+        <div class="analytics-grid">
+          <div class="metric">
+            <h3>Acceptance Rate</h3>
+            <p>@{
+              val acceptedCount = loans.count(_.status == "ACCEPTED")
+              f"${(acceptedCount.toDouble / loans.size) * 100}%.1f%%"
+            }</p>
+          </div>
+          <div class="metric">
+            <h3>Avg Loan Amount</h3>
+            <p>$@{
+              val acceptedLoans = loans.filter(_.status == "ACCEPTED")
+              if (acceptedLoans.nonEmpty) {
+                f"${acceptedLoans.map(_.amountRequested).sum / acceptedLoans.size}%.2f"
+              } else "0.00"
+            }</p>
+          </div>
+          <div class="metric">
+            <h3>Most Common Purpose</h3>
+            <p>@{
+              val acceptedLoans = loans.filter(_.status == "ACCEPTED")
+              if (acceptedLoans.nonEmpty) {
+                acceptedLoans.groupBy(_.intent).maxBy(_._2.size)._1
+              } else "N/A"
+            }</p>
+          </div>
+        </div>
+        <div class="grade-chart">
+          <h3>Grade Distribution</h3>
+          @defining(loans.filter(_.status == "ACCEPTED").groupBy(_.loanGrade).map { case (grade, gradeLoans) =>
+            (grade, (gradeLoans.size.toDouble / loans.count(_.status == "ACCEPTED") * 100).round)
+          }) { gradeDistribution =>
+            <div class="chart">
+              @for((grade, percentage) <- gradeDistribution.toSeq.sortBy(_._1)) {
+                <div class="chart-bar">
+                  <div class="bar-label">@grade</div>
+                  <div class="bar" style="width: '@percentage%'"></div>
+                  <div class="bar-value">@percentage%</div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="analytics-section rejected">
+        <h2>Rejected Loans Analytics</h2>
+        <div class="analytics-grid">
+          <div class="metric">
+            <h3>Rejection Rate</h3>
+            <p>@{
+              val rejectedCount = loans.count(_.status == "REJECTED")
+              f"${(rejectedCount.toDouble / loans.size) * 100}%.1f%%"
+            }</p>
+          </div>
+          <div class="metric">
+            <h3>Avg Loan Amount</h3>
+            <p>$@{
+              val rejectedLoans = loans.filter(_.status == "REJECTED")
+              if (rejectedLoans.nonEmpty) {
+                f"${rejectedLoans.map(_.amountRequested).sum / rejectedLoans.size}%.2f"
+              } else "0.00"
+            }</p>
+          </div>
+          <div class="metric">
+            <h3>Most Common Purpose</h3>
+            <p>@{
+              val rejectedLoans = loans.filter(_.status == "REJECTED")
+              if (rejectedLoans.nonEmpty) {
+                rejectedLoans.groupBy(_.intent).maxBy(_._2.size)._1
+              } else "N/A"
+            }</p>
+          </div>
+        </div>
+        <div class="grade-chart">
+          <h3>Grade Distribution</h3>
+          @defining(loans.filter(_.status == "REJECTED").groupBy(_.loanGrade).map { case (grade, gradeLoans) =>
+            (grade, (gradeLoans.size.toDouble / loans.count(_.status == "REJECTED") * 100).round)
+          }) { gradeDistribution =>
+            <div class="chart">
+              @for((grade, percentage) <- gradeDistribution.toSeq.sortBy(_._1)) {
+                <div class="chart-bar">
+                  <div class="bar-label">@grade</div>
+                  <div class="bar" style="width: '@percentage%'"></div>
+                  <div class="bar-value">@percentage%</div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
     <div class="loans-table">
       <h2>Previously Submitted Loans</h2>
       <table>
@@ -17,6 +113,7 @@
             <th>Amount</th>
             <th>Purpose</th>
             <th>Interest Rate</th>
+            <th>Grade</th>
             <th>Status</th>
           </tr>
         </thead>
@@ -27,6 +124,7 @@
             <td>$@{"%.2f".format(loan.amountRequested)}</td>
             <td>@loan.intent</td>
             <td>@{"%.1f".format(loan.interestRate)}%</td>
+            <td>@loan.loanGrade</td>
             <td>@loan.status</td>
           </tr>
         }
