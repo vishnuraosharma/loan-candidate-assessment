@@ -8,17 +8,11 @@ import org.apache.spark.sql.SparkSession
 
 object LoanGradeTransformationPipeline {
 
-  def transformData(dataPath: String)(implicit spark: SparkSession): DataFrame = {
+  def transformData(df: Dataset[_])(implicit spark: SparkSession): DataFrame = {
     import spark.implicits._
 
-    // Load data from the specified path
-    val rawDataInitial = spark.read
-      .option("header", "true")
-      .option("inferSchema", "true")
-      .csv(dataPath)
-
-    // Drop unnecessary columns
-    val rawData = rawDataInitial.drop("id", "loan_status")
+    // Drop unnecessary columns - modify this based on your input DataFrame
+    val rawData = df.drop("id")
 
     println("TransformData starting")
     rawData.printSchema()
