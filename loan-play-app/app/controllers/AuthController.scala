@@ -6,13 +6,18 @@ import play.api.data._
 import play.api.data.Forms._
 import play.api.i18n.I18nSupport
 
+import models._
+
 @Singleton
 class AuthController @Inject()(
                                 cc: MessagesControllerComponents
                               ) extends MessagesAbstractController(cc) with I18nSupport {
 
-  // In-memory storage (replace with database in production)
-  private val users = scala.collection.mutable.Map[String, User]()
+  // In-memory storage
+  private val users = scala.collection.mutable.Map[String, User](
+    "grantor1" -> User("g", "g1", "Loan Grantor"),
+    "requester1" -> User("r", "r1", "Loan Requester")
+  )
 
   // Form definitions
   val loginForm = Form(
@@ -81,4 +86,3 @@ class AuthController @Inject()(
 
 case class LoginData(username: String, password: String)
 case class SignupData(username: String, password: String, role: String)
-case class User(username: String, password: String, role: String)

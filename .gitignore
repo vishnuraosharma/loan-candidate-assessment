@@ -9,6 +9,9 @@ target/
 project/target/
 api/
 
+.metals/
+
+
 *.iml
 .idea
 .bsp/*
