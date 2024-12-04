@@ -137,7 +137,22 @@ class LoanController @Inject()(
                 case 5 => "F"
                 case _ => "G"
               }
-              println(letterGrade)
+
+              // Find the loan in the userLoans map and update it
+              userLoans.get(username).foreach { loans =>
+                loans.find(_.id == id).foreach { loan =>
+                  val updatedLoan = loan.copy(
+                    loanGrade = letterGrade,
+                    status = "REJECTED"
+                  )
+                  // Replace the old loan with the updated one
+                  loans.transform {
+                    case l if l.id == id => updatedLoan
+                    case l => l
+                  }
+                }
+              }
+
               //println(predictedStatus)
               Redirect(routes.DashboardController.index())
                 .flashing("success" -> s"Loan status calculated: $letterGrade")

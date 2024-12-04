@@ -134,7 +134,7 @@
       <div class="loan-actions">
         <select id="loanSelector" onchange="console.log(this.value)">
           <option value="">Select a loan...</option>
-          @for(loan <- loans) {
+          @for(loan <- loans.filter(_.status == "-")) {
             <option value="@loan.id">Loan ID: @loan.id</option>
           }
         </select>

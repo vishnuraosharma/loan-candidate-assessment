@@ -75,6 +75,7 @@
             <th>Amount</th>
             <th>Purpose</th>
             <th>Interest Rate</th>
+            <th>Grade</th>
             <th>Status</th>
           </tr>
         </thead>
@@ -85,21 +86,33 @@
             <td>$@{"%.2f".format(loan.amountRequested)}</td>
             <td>@loan.intent</td>
             <td>@{"%.1f".format(loan.interestRate)}%</td>
+            <td>@loan.loanGrade</td>
             <td>@loan.status</td>
           </tr>
         }
         </tbody>
       </table>
       
-      <div class="loan-actions">
-        <button onclick="location.href='@routes.LoanController.calculateLoanGrade(loans.head.id)'">
-          Calculate Loan Grade and Approval Status
-        </button>
-      </div>
+      @if(loans.exists(_.status == "-")) {
+        <div class="loan-actions">
+          <button onclick="calculateLoan()">
+            Calculate Loan Grade and Approval Status
+          </button>
+        </div>
+      }
     </div>
   }
 
   <div class="dashboard-actions">
     <button onclick="location.href='@routes.AuthController.logout'">Logout</button>
   </div>
+
+  <script>
+    function calculateLoan() {
+      const loans = JSON.parse('@{Html(play.api.libs.json.Json.toJson(loans.filter(_.status == "-").map(_.id)).toString())}');
+      if (loans && loans.length > 0) {
+        location.href = '@routes.LoanController.calculateLoanGrade("dummy")'.replace('dummy', loans[0]);
+      }
+    }
+  </script>
 }
