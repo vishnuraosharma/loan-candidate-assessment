@@ -477,15 +477,6 @@ val output = predictions.select(
 )
 
 
-// Saving the model, Print out the feature importances
-val featureImportances = model.featureImportances
-println(s"Feature Importances: $featureImportances")
-model
-  .write
-  .overwrite()
-  .save("./downloads")
-
-
 // COMMAND ----------
 
 display(output)

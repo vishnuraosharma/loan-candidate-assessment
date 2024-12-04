@@ -27,8 +27,8 @@ lazy val root = (project in file("."))
     ),
     fork := true
   )
-javaHome := Some(file("C:\\Program Files\\Java\\jdk-11"))
-scalaVersion := "2.13.14"
+
+scalaVersion := "2.13.15"
 
 // Resolve dependency conflicts
 ThisBuild / libraryDependencySchemes ++= Seq(
