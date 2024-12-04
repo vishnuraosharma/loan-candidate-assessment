@@ -33,19 +33,8 @@ class LoanStatusService {
         "loan_int_rate", "loan_percent_income",
         "cb_person_default_on_file_binary", "cb_person_cred_hist_length")
 
-      // Assuming df is your DataFrame with the necessary columns
-      val assembler = new VectorAssembler()
-        .setInputCols(Array(
-          "person_home_ownership_onehot_0",
-          "person_home_ownership_onehot_1",
-          "person_home_ownership_onehot_2"
-        ))
-        .setOutputCol("homeOwnershipVec")
-
-      val transformedDF = assembler.transform(loanDF)
-
       // Return the transformed DataFrame with the new vector column
-      transformedDF
+      LoanStatusTransformationPipeline.transformData(loanDF).toDF()
     } catch {
       case e: Exception =>
         logger.error(s"Error processing loan: ${e.getMessage}")
