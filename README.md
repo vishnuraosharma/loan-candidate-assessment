@@ -53,16 +53,27 @@ A Play Framework-based web application for loan management, featuring machine le
 ## Project Structure
 
 loan-play-app/
+
 ├── app/
+
 │ ├── controllers/ # Application controllers
+
 │ ├── models/ # Data models
+
 │ ├── services/ # Business logic and ML services
+
 │ └── views/ # Twirl templates
+
 ├── conf/
+
 │ ├── application.conf # Application configuration
+
 │ └── routes # URL routing configuration
+
 ├── model/ # ML model artifacts
+
 └── public/ # Static assets
+
 
 ## Machine Learning Pipeline
 
