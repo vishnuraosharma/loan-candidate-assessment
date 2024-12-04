@@ -33,25 +33,25 @@ object LoanStatusTransformationPipeline {
 
     // One-hot encode person_home_ownership
     val oneHotDF = incomeBracketedDF
-      .withColumn("person_home_ownership_onehot_0", 
+      .withColumn("person_home_ownership_onehot_0",
         when(col("person_home_ownership") === "RENT", 1).otherwise(0))
-      .withColumn("person_home_ownership_onehot_1", 
+      .withColumn("person_home_ownership_onehot_1",
         when(col("person_home_ownership") === "MORTGAGE", 1).otherwise(0))
-      .withColumn("person_home_ownership_onehot_2", 
+      .withColumn("person_home_ownership_onehot_2",
         when(col("person_home_ownership") === "OWN", 1).otherwise(0))
       .drop("person_home_ownership")
 
     // Similarly for loan_intent
     val finalDF = oneHotDF
-      .withColumn("loan_intent_onehot_0", 
+      .withColumn("loan_intent_onehot_0",
         when(col("loan_intent") === "EDUCATION", 1).otherwise(0))
-      .withColumn("loan_intent_onehot_1", 
+      .withColumn("loan_intent_onehot_1",
         when(col("loan_intent") === "MEDICAL", 1).otherwise(0))
-      .withColumn("loan_intent_onehot_2", 
+      .withColumn("loan_intent_onehot_2",
         when(col("loan_intent") === "PERSONAL", 1).otherwise(0))
-      .withColumn("loan_intent_onehot_3", 
+      .withColumn("loan_intent_onehot_3",
         when(col("loan_intent") === "VENTURE", 1).otherwise(0))
-      .withColumn("loan_intent_onehot_4", 
+      .withColumn("loan_intent_onehot_4",
         when(col("loan_intent") === "DEBTCONSOLIDATION", 1).otherwise(0))
       .drop("loan_intent")
 

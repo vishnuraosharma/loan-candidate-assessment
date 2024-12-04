@@ -1,10 +1,10 @@
 package services
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import models.Loan
 import org.slf4j.LoggerFactory
+import models.Loan
 
-class GrantorLoanService {
+class LoanGradeService {
   private val logger = LoggerFactory.getLogger(this.getClass)
   implicit val spark: SparkSession = SparkSessionSingleton.spark
 
@@ -13,7 +13,6 @@ class GrantorLoanService {
   def processLoan(loan: Loan): DataFrame = {
     logger.info(s"Processing loan with ID: ${loan.id}")
     try {
-      // Convert single loan to DataFrame with required schema
       val loanDF = Seq((
         loan.id,
         loan.personAge,
@@ -32,8 +31,7 @@ class GrantorLoanService {
         "loan_int_rate", "loan_percent_income",
         "cb_person_default_on_file_binary", "cb_person_cred_hist_length")
 
-      // Transform the data using the pipeline and convert to DataFrame
-      LoanStatusTransformationPipeline.transformData(loanDF).toDF()
+      LoanGradeTransformationPipeline.transformData(loanDF).toDF()
     } catch {
       case e: Exception =>
         logger.error(s"Error processing loan: ${e.getMessage}")
