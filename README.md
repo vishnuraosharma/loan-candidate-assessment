@@ -77,7 +77,7 @@ loan-play-app/
 
 ## Machine Learning Pipeline
 
-Data sourced from (Loan Approval Kaggle Competition)[https://www.kaggle.com/competitions/playground-series-s4e10/overview]
+Data sourced from [Loan Approval Kaggle Competition](https://www.kaggle.com/competitions/playground-series-s4e10/overview)
 
 The application uses two main ML models:
 1. Loan Status Model: Predicts approval/rejection
