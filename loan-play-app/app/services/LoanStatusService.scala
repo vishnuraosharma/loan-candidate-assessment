@@ -3,19 +3,18 @@ package services
 import org.apache.spark.sql.{SparkSession, DataFrame, Dataset, Row}
 import org.apache.spark.sql.functions._
 import models.Loan
-import org.apache.spark.serializer.KryoSerializer
 
-class GrantorLoanService {
-  implicit val spark: SparkSession = SparkSession
-    .builder()
-    .appName("test")
-    .master("local[*]")
-    .getOrCreate()
+import org.slf4j.LoggerFactory
+import org.apache.spark.ml.feature.VectorAssembler
+
+class LoanStatusService {
+  private val logger = LoggerFactory.getLogger(this.getClass)
+  implicit val spark: SparkSession = SparkSessionSingleton.spark
 
   import spark.implicits._
 
   def processLoan(loan: Loan): DataFrame = {
-    // Convert single loan to DataFrame with required schema
+   try { // Convert single loan to DataFrame with required schema
     val loanDF = Seq((
       loan.id,
       loan.personAge,
@@ -34,7 +33,13 @@ class GrantorLoanService {
       "loan_int_rate", "loan_percent_income",
       "cb_person_default_on_file_binary", "cb_person_cred_hist_length")
 
+
     // Transform the data using the pipeline and convert to DataFrame
     LoanStatusTransformationPipeline.transformData(loanDF).toDF()
+
+    } catch {
+      case e: Exception =>
+        logger.error(s"Error processing loan: ${e.getMessage}")
+        throw new RuntimeException("Failed to process loan", e)
   }
 }

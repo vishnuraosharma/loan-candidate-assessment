@@ -42,8 +42,9 @@ object LoanStatusTransformationPipeline {
       .drop("person_home_ownership")
 
     // Similarly for loan_intent
-    val finalDF = oneHotDF
-      .withColumn("loan_intent_onehot_0", 
+
+    val onehotterDF = oneHotDF
+      .withColumn("loan_intent_onehot_0",
         when(col("loan_intent") === "EDUCATION", 1).otherwise(0))
       .withColumn("loan_intent_onehot_1", 
         when(col("loan_intent") === "MEDICAL", 1).otherwise(0))
@@ -55,9 +56,34 @@ object LoanStatusTransformationPipeline {
         when(col("loan_intent") === "DEBTCONSOLIDATION", 1).otherwise(0))
       .drop("loan_intent")
 
+    // add a col called loan_intent_onehot with all 0s as placeholder
+    val finalDF = onehotterDF.withColumn("loan_intent_onehot", lit(0))
+
     println("Final schema:")
     finalDF.printSchema()
     println("ashjkjfds")
-    finalDF
+    finalDF.select(
+      "person_age",
+      "person_emp_length",
+      "loan_amnt",
+      "loan_int_rate",
+      "loan_percent_income",
+      "cb_person_cred_hist_length",
+      "cb_person_default_on_file_binary",
+      "remaining_income_to_receive",
+      "remaining_employment_length",
+      "age_to_history_length_ratio",
+      "income_bracket",
+      "credit_risk",
+      "person_home_ownership_onehot_0",
+      "person_home_ownership_onehot_1",
+      "person_home_ownership_onehot_2",
+      "loan_intent_onehot",
+      "loan_intent_onehot_0",
+      "loan_intent_onehot_1",
+      "loan_intent_onehot_2",
+      "loan_intent_onehot_3",
+      "loan_intent_onehot_4"
+    )
   }
 }
