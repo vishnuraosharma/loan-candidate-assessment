@@ -158,7 +158,7 @@
     function calculateSelectedLoan() {
       const selectedLoanId = document.getElementById('loanSelector').value;
       if (selectedLoanId) {
-        location.href = '@routes.LoanController.calculateLoanGrade("dummy")'.replace('dummy', selectedLoanId);
+        location.href = '/loans/' + selectedLoanId + '/calculate';
       } else {
         alert('Please select a loan first');
       }
