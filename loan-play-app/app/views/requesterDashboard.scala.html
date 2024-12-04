@@ -93,6 +93,40 @@
         </tbody>
       </table>
       
+      @for(loan <- loans.filter(_.status != "-")) {
+        <div class="model-info-container">
+          <details class="model-info-dropdown">
+            <summary>Model Information</summary>
+            <div class="model-info-content">
+              <div class="probability-info">
+                <div class="probability-item">
+                  <span class="probability-label">Status Confidence:</span>
+                  <span class="probability-value">@{"%.1f".format(loan.statusProbability * 100)}%</span>
+                </div>
+                <div class="probability-item">
+                  <span class="probability-label">Grade Confidence:</span>
+                  <span class="probability-value">@{"%.1f".format(loan.gradeProbability * 100)}%</span>
+                </div>
+              </div>
+              <div class="feature-importance-chart">
+                <h3>Feature Importance Scores</h3>
+                <div class="chart">
+                  @loan.featureImportances.map { importances =>
+                    @for((feature, importance) <- importances.take(10)) {
+                      <div class="chart-bar">
+                        <div class="bar-label">@feature</div>
+                        <div class="bar" style="width: @{importance * 100}%"></div>
+                        <div class="bar-value">@{"%.1f".format(importance * 100)}%</div>
+                      </div>
+                    }
+                  }
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+      }
+      
       @if(loans.exists(_.status == "-")) {
         <div class="loan-actions">
           <button onclick="calculateLoan()">
@@ -101,18 +135,18 @@
         </div>
       }
     </div>
-  }
 
-  <div class="dashboard-actions">
-    <button onclick="location.href='@routes.AuthController.logout'">Logout</button>
-  </div>
+    <div class="dashboard-actions">
+      <button onclick="location.href='@routes.AuthController.logout'">Logout</button>
+    </div>
 
-  <script>
-    function calculateLoan() {
-      const loans = JSON.parse('@{Html(play.api.libs.json.Json.toJson(loans.filter(_.status == "-").map(_.id)).toString())}');
-      if (loans && loans.length > 0) {
-        location.href = '@routes.LoanController.calculateLoanGrade("dummy")'.replace('dummy', loans[0]);
+    <script>
+      function calculateLoan() {
+        const loans = JSON.parse('@{Html(play.api.libs.json.Json.toJson(loans.filter(_.status == "-").map(_.id)).toString())}');
+        if (loans && loans.length > 0) {
+          location.href = '@routes.LoanController.calculateLoanGrade("dummy")'.replace('dummy', loans[0]);
+        }
       }
-    }
-  </script>
+    </script>
+  }
 }

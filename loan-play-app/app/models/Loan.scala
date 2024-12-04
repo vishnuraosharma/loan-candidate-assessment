@@ -13,5 +13,8 @@ case class Loan(
                  creditHistory: Int,
                  grantorUsername: String,
                  status: String = "-",
-                 loanGrade: String = "-"
+                 loanGrade: String = "-",
+                 statusProbability: Double = 0.0,
+                 gradeProbability: Double = 0.0,
+                 featureImportances: Option[Seq[(String, Double)]] = None
                )

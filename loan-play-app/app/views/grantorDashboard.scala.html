@@ -114,7 +114,9 @@
             <th>Purpose</th>
             <th>Interest Rate</th>
             <th>Grade</th>
+            <th>Grade Confidence</th>
             <th>Status</th>
+            <th>Status Confidence</th>
           </tr>
         </thead>
         <tbody>
@@ -125,7 +127,9 @@
             <td>@loan.intent</td>
             <td>@{"%.1f".format(loan.interestRate)}%</td>
             <td>@loan.loanGrade</td>
+            <td>@{"%.1f".format(loan.gradeProbability * 100)}%</td>
             <td>@loan.status</td>
+            <td>@{"%.1f".format(loan.statusProbability * 100)}%</td>
           </tr>
         }
         </tbody>
