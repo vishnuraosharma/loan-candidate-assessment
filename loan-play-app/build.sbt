@@ -28,7 +28,8 @@ lazy val root = (project in file("."))
     fork := true
   )
 
-scalaVersion := "2.13.15"
+scalaVersion := "2.13.14"
+
 
 // Resolve dependency conflicts
 ThisBuild / libraryDependencySchemes ++= Seq(
