@@ -1,10 +1,10 @@
 package services
 
-import org.apache.spark.ml.{Pipeline, PipelineModel}
+import org.apache.spark.ml.Pipeline
 import org.apache.spark.sql.{DataFrame, Dataset}
 import org.apache.spark.sql.functions._
-import org.apache.spark.ml.feature.{StringIndexer, OneHotEncoder, VectorAssembler}
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.expressions.UserDefinedFunction
 
 object LoanGradeTransformationPipeline {
 
@@ -17,58 +17,42 @@ object LoanGradeTransformationPipeline {
     println("TransformData starting")
     rawData.printSchema()
 
-    // Index and then OneHotEncode features
+    // Define home ownership one-hot encoding
+    val homeOwnershipDF = rawData
+      .withColumn("homeOwnership_onehot_0",
+        when(col("person_home_ownership") === "RENT", 1).otherwise(0))
+      .withColumn("homeOwnership_onehot_1",
+        when(col("person_home_ownership") === "MORTGAGE", 1).otherwise(0))
+      .withColumn("homeOwnership_onehot_2",
+        when(col("person_home_ownership") === "OWN", 1).otherwise(0))
+      .drop("person_home_ownership")
 
-    // home_ownership
-    val homeOwnershipIndexer = new StringIndexer()
-      .setInputCol("person_home_ownership")
-      .setOutputCol("homeOwnershipIndex")
-      .fit(rawData)
-    val homeOwnershipEncoder = new OneHotEncoder()
-      .setInputCol("homeOwnershipIndex")
-      .setOutputCol("homeOwnershipVec")
-
-    // loan_intent
-    val loanIntentIndexer = new StringIndexer()
-      .setInputCol("loan_intent")
-      .setOutputCol("loanIntentIndex")
-      .fit(rawData)
-    val loanIntentEncoder = new OneHotEncoder()
-      .setInputCol("loanIntentIndex")
-      .setOutputCol("loanIntentVec")
-
-    // cb_person_default_on_file
-    val defaultOnFileIndexer = new StringIndexer()
-      .setInputCol("cb_person_default_on_file")
-      .setOutputCol("defaultOnFileIndex")
-      .fit(rawData)
-    val defaultOnFileEncoder = new OneHotEncoder()
-      .setInputCol("defaultOnFileIndex")
-      .setOutputCol("defaultOnFileVec")
-
-    val assembler = new VectorAssembler()
-      .setInputCols(Array("homeOwnershipVec", "loanIntentVec", "defaultOnFileVec", "person_age",
-        "person_income", "person_emp_length", "loan_amnt", "loan_int_rate", "loan_percent_income",
-        "cb_person_cred_hist_length"))
-      .setOutputCol("features")
-
-    // Pipeline stages
-    val pipeline = new Pipeline().setStages(Array(homeOwnershipIndexer, homeOwnershipEncoder,
-      loanIntentIndexer, loanIntentEncoder, defaultOnFileIndexer, defaultOnFileEncoder,
-      assembler))
-
-    // Fit the pipeline
-    val model = pipeline.fit(rawData)
-    val transformedData = model.transform(rawData)
-
-    val finalDF = transformedData.drop("person_home_ownership")
+    // Similarly for loan_intent
+    val loanIntentDF = homeOwnershipDF
+      .withColumn("loan_intent_onehot_0",
+        when(col("loan_intent") === "EDUCATION", 1).otherwise(0))
+      .withColumn("loan_intent_onehot_1",
+        when(col("loan_intent") === "MEDICAL", 1).otherwise(0))
+      .withColumn("loan_intent_onehot_2",
+        when(col("loan_intent") === "PERSONAL", 1).otherwise(0))
+      .withColumn("loan_intent_onehot_3",
+        when(col("loan_intent") === "VENTURE", 1).otherwise(0))
+      .withColumn("loan_intent_onehot_4",
+        when(col("loan_intent") === "DEBTCONSOLIDATION", 1).otherwise(0))
       .drop("loan_intent")
-      .drop("cb_person_default_on_file")
+
+    // Define cb_person_default_on_file one-hot encoding
+    val finalDF = loanIntentDF
+      .withColumn("defaultOnFile_onehot_0",
+        when(col("cb_person_default_on_file_binary") === "Y", 1).otherwise(0))
+      .withColumn("defaultOnFile_onehot_1",
+        when(col("cb_person_default_on_file_binary") === "N", 1).otherwise(0))
+      .drop("cb_person_default_on_file_binary")
       .drop("loan_grade")
 
     println("Final schema:")
     finalDF.printSchema()
-
+    println("done")
     finalDF
   }
 }

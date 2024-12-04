@@ -12,13 +12,16 @@ import services.GrantorLoanService
 import services.LoanGradeService
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.ml.classification.MultilayerPerceptronClassificationModel
+import org.apache.spark.sql.SparkSession
 
 @Singleton
 class LoanController @Inject()(
                                 cc: MessagesControllerComponents,
                                 grantorLoanService: GrantorLoanService,
-                                loanGradeService: LoanGradeService
+                                gradeService:LoanGradeService,
+                                env: play.api.Environment
                               ) extends MessagesAbstractController(cc) with I18nSupport {
+
 
   // Map of username -> their loans
   private val userLoans = scala.collection.mutable.Map[String, scala.collection.mutable.ArrayBuffer[Loan]]()
@@ -74,7 +77,8 @@ class LoanController @Inject()(
             
             // Process loan through Spark pipeline
             val transformedDF = grantorLoanService.processLoan(loan)
-            val gradeDF = loanGradeService.processLoan(loan)
+            val gradeDF = gradeService.processLoan(loan)
+            //val gradeDF = loanGradeService.processLoan(loan)
             // Print the id of the loan
             println(s"Loan ID: ${loan.id}")
             //print the id column of the transformedDF
@@ -110,10 +114,12 @@ class LoanController @Inject()(
           case Some(loan) =>
             try {
               // Process the loan through the grade service to get the feature vector
-              val gradeDF = loanGradeService.processLoan(loan)
+              val gradeDF = gradeService.processLoan(loan)
+
               
               // Load the saved model
-              val model = MultilayerPerceptronClassificationModel.load("model/loan_grade_model")
+              //C:\Users\momog\Desktop\loan-candidate-assessment\loan-play-app\model\loan_grader_model\metadata
+              val model = MultilayerPerceptronClassificationModel.load("C:\\Users\\momog\\Desktop\\loan-candidate-assessment\\loan-play-app\\model\\loan_grader_model")
               
               // Make prediction
               val prediction = model.transform(gradeDF)
