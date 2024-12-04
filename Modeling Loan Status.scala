@@ -421,6 +421,21 @@ finalTest.columns
 
 // COMMAND ----------
 
+
+val joinedDF = train
+  .join(finalTrain, "id") // Joining on 'id'
+  .groupBy("loan_intent") // Grouping by 'person_home_ownership'
+  .agg(
+    sum("loan_intent_onehot_0").alias("sum_person_home_ownership_onehot_0"),
+    sum("loan_intent_onehot_1"),
+    sum("loan_intent_onehot_2"),
+    sum("loan_intent_onehot_3"),
+    sum("loan_intent_onehot_4")  )
+
+joinedDF.show()
+
+// COMMAND ----------
+
 import org.apache.spark.ml.Pipeline
 import org.apache.spark.ml.classification.RandomForestClassifier
 import org.apache.spark.ml.feature.VectorAssembler
@@ -612,3 +627,15 @@ println(s"Recall: $recall")
 
 
 // COMMAND ----------
+
+// Specify the path to save the model
+val modelPath = "FileStore/loan_approval"
+// Save the trained model
+model.write.overwrite().save(modelPath)
+println(s"Model saved at: $modelPath")
+
+// COMMAND ----------
+
+import org.apache.spark.ml.PipelineModel 
+
+val model = PipelineModel.load(modelPath)
