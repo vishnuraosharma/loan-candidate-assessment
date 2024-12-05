@@ -16,8 +16,12 @@ object LoanStatusTransformationPipeline {
     val updatedDF = df
       .withColumn("remaining_income_to_receive", col("person_income") * (lit(80) - col("person_age")))
       .withColumn("remaining_employment_length", lit(65) - col("person_age"))
-      .withColumn("age_to_history_length_ratio", col("person_age") / col("cb_person_cred_hist_length"))
-      .withColumn("credit_risk", (col("loan_amnt") * col("loan_int_rate")) / col("cb_person_cred_hist_length"))
+      .withColumn("age_to_history_length_ratio", 
+        when(col("cb_person_cred_hist_length") === 0, 0)
+          .otherwise(col("person_age") / col("cb_person_cred_hist_length")))
+      .withColumn("credit_risk", 
+        when(col("cb_person_cred_hist_length") === 0, 0)
+          .otherwise((col("loan_amnt") * col("loan_int_rate")) / col("cb_person_cred_hist_length")))
 
     // Define income bucket UDF
     val incomeBuckets: UserDefinedFunction = udf((income: Int) => income match {

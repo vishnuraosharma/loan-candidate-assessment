@@ -28,8 +28,7 @@ class LoanController @Inject()(
   // Map of username -> their loans
   private val userLoans = scala.collection.mutable.Map[String, scala.collection.mutable.ArrayBuffer[Loan]]()
   
-  // Store DataFrames for each grantor
-  private val grantorDataFrames = scala.collection.mutable.Map[String, DataFrame]()
+
 
   val loanForm = Form(
     mapping(
@@ -121,12 +120,16 @@ class LoanController @Inject()(
 
               // Extract both prediction and probability
               val predictedGrade = gradeprediction.select("prediction").first().getDouble(0)
+              println("grade", predictedGrade)
               val predictedGradeProb = gradeprediction.select("probability").first().getAs[org.apache.spark.ml.linalg.Vector](0)
                 .toArray.max // Get highest probability from probability vector
+              println("grade prob", predictedGradeProb)
 
               val predictedStatus = statusprediction.select("prediction").first().getDouble(0)
+              println("status", predictedStatus)
               val predictedStatusProb = statusprediction.select("probability").first().getAs[org.apache.spark.ml.linalg.Vector](0)
                 .toArray.max
+              println("status prob", predictedStatusProb)
 
               // Convert numeric prediction to readable output
               val finalStatus = predictedStatus match {
@@ -186,9 +189,7 @@ class LoanController @Inject()(
     }
   }
 
-  def getGrantorDataFrame(grantorUsername: String): Option[DataFrame] = {
-    grantorDataFrames.get(grantorUsername)
-  }
+
 
   def getFeatureImportances(model: RandomForestClassificationModel): Seq[(String, Double)] = {
     val featureNames = Array(
@@ -205,4 +206,9 @@ class LoanController @Inject()(
     val importances = model.featureImportances.toArray
     featureNames.zip(importances).sortBy(-_._2)
   }
+
+  
 }
+
+
+

@@ -34,7 +34,9 @@ class LoanStatusService {
         "cb_person_default_on_file_binary", "cb_person_cred_hist_length")
 
       // Return the transformed DataFrame with the new vector column
-      LoanStatusTransformationPipeline.transformData(loanDF).toDF()
+      val final_df = LoanStatusTransformationPipeline.transformData(loanDF).toDF()
+      final_df.show()
+      final_df
     } catch {
       case e: Exception =>
         logger.error(s"Error processing loan: ${e.getMessage}")
