@@ -42,7 +42,10 @@ libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "7.0.1
 val sparkVersion = "3.5.0"
 libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-sql" % sparkVersion,
-  "org.apache.spark" %% "spark-mllib" % sparkVersion
+  "org.apache.spark" %% "spark-mllib" % sparkVersion，
+  "org.scalatest" %% "scalatest" % "3.2.15" % Test,
+  "org.apache.spark" %% "spark-sql" % "3.3.0" % Test,
+  "org.apache.spark" %% "spark-mllib" % "3.3.0" % Test
 )
 
 // Force resolution of conflicting dependencies
