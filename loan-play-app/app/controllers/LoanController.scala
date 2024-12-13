@@ -119,9 +119,6 @@ class LoanController @Inject()(
               val statusprediction = statusmodel.transform(statusDF)
               println("Loan Status Prediction Made")
 
-              // get confusion matrix
-              val confusionMatrix = getGradeConfusionMatrix(gradeprediction)
-
               // Extract both prediction and probability
               val predictedGrade = gradeprediction.select("prediction").first().getDouble(0)
               println("grade", predictedGrade)
