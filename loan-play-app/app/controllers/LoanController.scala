@@ -15,6 +15,7 @@ import org.apache.spark.ml.tuning.CrossValidatorModel
 import org.apache.spark.ml.PipelineModel
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.ml.classification.RandomForestClassificationModel
+import org.apache.spark.sql.functions._
 
 @Singleton
 class LoanController @Inject()(
@@ -118,6 +119,9 @@ class LoanController @Inject()(
               val statusprediction = statusmodel.transform(statusDF)
               println("Loan Status Prediction Made")
 
+              // get confusion matrix
+              val confusionMatrix = getGradeConfusionMatrix(gradeprediction)
+
               // Extract both prediction and probability
               val predictedGrade = gradeprediction.select("prediction").first().getDouble(0)
               println("grade", predictedGrade)
@@ -207,7 +211,32 @@ class LoanController @Inject()(
     featureNames.zip(importances).sortBy(-_._2)
   }
 
-  
+  def getGradeConfusionMatrix(predictions: DataFrame): Seq[(String, String, Long)] = {
+    val confMatrix = predictions
+      .select(
+        when(col("prediction") === 0.0, "A")
+          .when(col("prediction") === 1.0, "B")
+          .when(col("prediction") === 2.0, "C")
+          .when(col("prediction") === 3.0, "D")
+          .when(col("prediction") === 4.0, "E")
+          .otherwise("F").as("Predicted"),
+        when(col("loan_grade") === 0.0, "A")
+          .when(col("loan_grade") === 1.0, "B")
+          .when(col("loan_grade") === 2.0, "C")
+          .when(col("loan_grade") === 3.0, "D")
+          .when(col("loan_grade") === 4.0, "E")
+          .otherwise("F").as("Actual")
+      )
+      .groupBy("Actual", "Predicted")
+      .count()
+    confMatrix.collect()
+      .map(row => (
+        row.getAs[String]("Actual"),
+        row.getAs[String]("Predicted"),
+        row.getAs[Long]("count")
+      ))
+      .sortBy(x => (x._1, x._2))
+  }
 }
 
 

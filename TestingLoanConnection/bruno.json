@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "TestingLoanConnection",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
