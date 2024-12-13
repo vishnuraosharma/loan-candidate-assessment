@@ -8,7 +8,6 @@ class LoanStatusSpec extends AnyFunSpec with Matchers {
 
   describe("LoanStatus") {
     it("should train random forest model and make predictions successfully") {
-      // Arrange
       val spark = SparkSession.builder
         .appName("Loan Status Test")
         .master("local[*]")
@@ -16,7 +15,6 @@ class LoanStatusSpec extends AnyFunSpec with Matchers {
 
       import spark.implicits._
 
-      // Create test training data
       val trainData = Seq(
         (1, 25, 50000, "RENT", 3.0, "PERSONAL", 10000, 0.1, 0.2, "Y", 5, 1),
         (2, 35, 75000, "MORTGAGE", 5.0, "EDUCATION", 15000, 0.15, 0.2, "N", 8, 0),
@@ -36,7 +34,6 @@ class LoanStatusSpec extends AnyFunSpec with Matchers {
         "loan_status"
       )
 
-      // Create test data
       val testData = Seq(
         (1, 30, 60000, "RENT", 4.0, "PERSONAL", 12000, 0.11, 0.2, "N", 6),
         (2, 40, 85000, "MORTGAGE", 6.0, "EDUCATION", 17000, 0.14, 0.2, "Y", 9)
@@ -54,18 +51,15 @@ class LoanStatusSpec extends AnyFunSpec with Matchers {
         "cb_person_cred_hist_length"
       )
 
-      // Create temporary directories for data
       val tempDir = Files.createTempDirectory("loan_status_test")
       val trainPath = tempDir.resolve("train.csv")
       val testPath = tempDir.resolve("test.csv")
       val modelPath = tempDir.resolve("model")
 
       try {
-        // Save test data to temporary files
         trainData.write.option("header", true).csv(trainPath.toString)
         testData.write.option("header", true).csv(testPath.toString)
 
-        // Act
         val args = Array(
           trainPath.toString,
           testPath.toString,
@@ -76,23 +70,18 @@ class LoanStatusSpec extends AnyFunSpec with Matchers {
           LoanStatus.main(args)
         }
 
-        // Assert
         Files.exists(modelPath) shouldBe true
 
-        // Load and verify the saved model
         val loadedModel = PipelineModel.load(modelPath.toString)
         loadedModel should not be null
 
-        // Test predictions
         val predictions = loadedModel.transform(testData)
         predictions.select("prediction").count() shouldBe testData.count()
 
-        // Verify feature engineering
         val transformedData = predictions.select("features")
         transformedData.first().getAs[org.apache.spark.ml.linalg.Vector](0).size shouldBe 14 // Expected number of features
 
       } finally {
-        // Clean up
         deleteRecursively(tempDir)
         spark.stop()
       }
@@ -106,7 +95,6 @@ class LoanStatusSpec extends AnyFunSpec with Matchers {
 
       import spark.implicits._
 
-      // Create test data with nulls
       val testDataWithNulls = Seq(
         (1, null, 50000, "RENT", null, "PERSONAL", 10000, 0.1, 0.2, "Y", 5, 1),
         (2, 35, null, "MORTGAGE", 5.0, null, 15000, null, 0.2, "N", null, 0)
@@ -151,7 +139,6 @@ class LoanStatusSpec extends AnyFunSpec with Matchers {
     }
   }
 
-  // Helper method to recursively delete directory
   private def deleteRecursively(path: Path): Unit = {
     if (Files.exists(path)) {
       if (Files.isDirectory(path)) {
